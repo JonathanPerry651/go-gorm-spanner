@@ -206,7 +206,7 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 		return "FLOAT64"
 	case schema.String:
 		var size string
-		if field.Size == 0 || field.Size > 2621440 {
+		if field.Size <= 0 || field.Size > 2621440 {
 			size = "MAX"
 		} else {
 			size = fmt.Sprintf("%d", field.Size)
@@ -214,7 +214,7 @@ func (dialector Dialector) DataTypeOf(field *schema.Field) string {
 		return fmt.Sprintf("STRING(%s)", size)
 	case schema.Bytes:
 		var size string
-		if field.Size == 0 || field.Size > 10485760 {
+		if field.Size <= 0 || field.Size > 10485760 {
 			size = "MAX"
 		} else {
 			size = fmt.Sprintf("%d", field.Size)

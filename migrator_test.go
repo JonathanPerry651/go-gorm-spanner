@@ -35,10 +35,11 @@ import (
 
 type singer struct {
 	gorm.Model
-	FirstName string
+	FirstName string `gorm:"size:max"`
 	LastName  string
 	FullName  string
 	Active    bool
+	RawBytes  []byte `gorm:"size:max"`
 }
 
 type album struct {
@@ -92,7 +93,7 @@ func TestMigrate(t *testing.T) {
 	if g, w := request.GetStatements()[1],
 		"CREATE TABLE `singers` ("+
 			"`id` INT64 DEFAULT (GET_NEXT_SEQUENCE_VALUE(Sequence singers_seq)),`created_at` TIMESTAMP,`updated_at` TIMESTAMP,`deleted_at` TIMESTAMP,"+
-			"`first_name` STRING(MAX),`last_name` STRING(MAX),`full_name` STRING(MAX),`active` BOOL) "+
+			"`first_name` STRING(MAX),`last_name` STRING(MAX),`full_name` STRING(MAX),`active` BOOL,`raw_bytes` BYTES(MAX)) "+
 			"PRIMARY KEY (`id`)"; g != w {
 		t.Fatalf("create singers statement text mismatch\n Got: %s\nWant: %s", g, w)
 	}
@@ -287,6 +288,14 @@ func putSingerColDetailsResult(server *testutil.MockedSpannerInMemTestServer, sq
 					{Kind: &structpb.Value_NullValue{}},
 					{Kind: &structpb.Value_BoolValue{BoolValue: true}},
 					{Kind: &structpb.Value_StringValue{StringValue: "BOOL"}},
+					{Kind: &structpb.Value_NullValue{}},
+					{Kind: &structpb.Value_NullValue{}},
+				}},
+				{Values: []*structpb.Value{
+					{Kind: &structpb.Value_StringValue{StringValue: "raw_bytes"}},
+					{Kind: &structpb.Value_NullValue{}},
+					{Kind: &structpb.Value_BoolValue{BoolValue: true}},
+					{Kind: &structpb.Value_StringValue{StringValue: "BYTES"}},
 					{Kind: &structpb.Value_NullValue{}},
 					{Kind: &structpb.Value_NullValue{}},
 				}},
